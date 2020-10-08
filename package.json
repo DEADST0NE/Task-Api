@@ -1,0 +1,31 @@
+{
+  "name": "task",
+  "version": "1.0.0",
+  "description": "js, node js, graphQl, mongoDB, Swagger",
+  "main": "index.js",
+  "repository": "https://github.com/DEADST0NE/Task-bakend.git",
+  "author": "Ruslan <deadstone@list.ru>",
+  "license": "MIT",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "dependencies": {
+    "@hapi/hapi": "^20.0.1",
+    "nodemon": "^2.0.4"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.10",
+    "prettier": "^2.0.5",
+    "stylelint": "^13.6.1",
+    "stylelint-config-airbnb": "0.0.0",
+    "stylelint-config-idiomatic-order": "^8.1.0",
+    "stylelint-config-prettier": "^8.0.1",
+    "stylelint-order": "^4.1.0",
+    "stylelint-prettier": "^1.1.2"
+  }
+}
