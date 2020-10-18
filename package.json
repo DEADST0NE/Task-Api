@@ -2,19 +2,27 @@
   "name": "task",
   "version": "1.0.0",
   "description": "js, node js, graphQl, mongoDB, Swagger",
-  "main": "app.js",
+  "main": "index.js",
   "repository": "https://github.com/DEADST0NE/Task-bakend.git",
   "author": "Ruslan <deadstone@list.ru>",
   "license": "MIT",
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "nodemon index.js"
   },
   "dependencies": {
+    "@prisma/client": "^2.9.0",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
-    "mongoose": "^5.10.8",
-    "nodemon": "^2.0.4"
+    "ftp": "^0.3.10",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.4",
+    "pg": "^8.4.1",
+    "pg-hstore": "^2.3.3"
   },
   "devDependencies": {
+    "@prisma/cli": "^2.4.1",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
