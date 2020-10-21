@@ -8,8 +8,13 @@ datasource db {
 }
 
 model users {
-  id       String @id
-  email    String
+  id       String @id @default(dbgenerated())
+  email    String @unique
   name     String
   password String
+}
+
+model jobPositions {
+  id   Int     @id
+  name String?
 }
