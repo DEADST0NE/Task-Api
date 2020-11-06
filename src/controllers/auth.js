@@ -6,7 +6,8 @@ const { PrismaClient } = require('@prisma/client')
 
 const prisma = new PrismaClient()
 
-module.exports.login = async (req, res) => {
+//------------ signIn ------------
+module.exports.signIn = async (req, res) => { 
   try {
     const condidate = await prisma.users.findOne({
       where: {
@@ -15,31 +16,35 @@ module.exports.login = async (req, res) => {
     })
     if(condidate) {
       if(condidate.password === req.body.password) {
-        const token = jwt.sign({ ...condidate }, config.token_config, {expiresIn: 60 * 60})
-        res.status(200).json({ token: token })
-        return;
+        const token = jwt.sign({ ...condidate }, config.token_config, {expiresIn: 60 * 60}) 
+        return res.status(200).json({ token: `Bearer ${token}` });
       } 
-      else{
-        res.status(401).json({
-          message: 'Неверный пароль'
-        })
-        return;
-      }
-    }else{
-      res.status(401).json({
-          message: 'Текущий email не зарегистрирован'
-        })
-      return;
+      return res.status(401).json({ message: 'Неверный пароль' });
     }
+    return res.status(401).json({ message: 'Текущий email не зарегистрирован' });
   }
   catch (err){
-    res.status(500).json({ message: 'Ошибка подключения к базе данных' })
-    return;
+    return res.status(500).json({ message: 'Ошибка подключения к базе данных' });
   }  
 }
+//--------------------------------
 
+//--------- refreshToken ---------
+module.exports.refreshToken = (req, res) => { 
+  const refreshToken = req.body.token; 
+  if(refreshToken){ 
+    const user = jwt.decode(refreshToken); 
+    delete user.exp;
+    delete user.iat;
+    const token = jwt.sign({ ...user }, config.token_config);
+    return res.status(200).json({ token: `Bearer ${token}` });
+  }
+  return res.status(401).json({ message: 'Токен не указан' });
+}
+//--------------------------------
 
-module.exports.register = async (req, res) => { 
+//------------ signUp ------------
+module.exports.signUp = async (req, res) => { 
   const condidate = await prisma.users.findOne({
     where: {
       email: req.body.email,
@@ -53,17 +58,12 @@ module.exports.register = async (req, res) => {
         password: req.body.password,
       }
     })
-    console.log(newCondidate);
-    const token = jwt.sign({ ...newCondidate }, config.token_config, {expiresIn: 60 * 60})
-    res.status(200).json({ token: token })
-    return;
-  } else{
-    res.status(401).json({
-        message: 'Текущий email зарегистрирован'
-      })
-    return;
+    const token = jwt.sign({ ...newCondidate }, config.token_config, {expiresIn: 60 * 60}) 
+    return res.status(200).json({ token: `Bearer ${token}` });
   }
+  return res.status(401).json({ message: 'Текущий email зарегистрирован' });
 }
+//--------------------------------
 
 const putFileFtp = (path, file, fileName, expansion) => {
   let client = new ClientFtp();
