@@ -4,6 +4,9 @@ const ClientFtp = require('ftp')
 const fs = require('fs')
 const { PrismaClient } = require('@prisma/client')
 
+const { getToken } = require('../utils/token')
+const { hash, compare } = require('../utils/bcrypt')
+
 const prisma = new PrismaClient()
 
 //------------ signIn ------------
@@ -15,15 +18,16 @@ module.exports.signIn = async (req, res) => {
       },
     })
     if(condidate) {
-      if(condidate.password === req.body.password) {
-        const token = jwt.sign({ ...condidate }, config.token_config, {expiresIn: 60 * 60}) 
-        return res.status(200).json({ token: `Bearer ${token}` });
+      if(compare(condidate.password, req.body.password)) {
+        delete condidate.password; 
+        return res.status(200).json({ token: getToken({ ...condidate }) });
       } 
-      return res.status(401).json({ message: 'Неверный пароль' });
+      return res.status(412).json({ password: 'Неверный пароль' });
     }
-    return res.status(401).json({ message: 'Текущий email не зарегистрирован' });
+    return res.status(412).json({ email: 'Текущий email не зарегистрирован' });
   }
   catch (err){
+    console.log(err);
     return res.status(500).json({ message: 'Ошибка подключения к базе данных' });
   }  
 }
@@ -35,9 +39,8 @@ module.exports.refreshToken = (req, res) => {
   if(refreshToken){ 
     const user = jwt.decode(refreshToken); 
     delete user.exp;
-    delete user.iat;
-    const token = jwt.sign({ ...user }, config.token_config);
-    return res.status(200).json({ token: `Bearer ${token}` });
+    delete user.iat; 
+    return res.status(200).json({ token: getToken({ ...user }) });
   }
   return res.status(401).json({ message: 'Токен не указан' });
 }
@@ -45,23 +48,33 @@ module.exports.refreshToken = (req, res) => {
 
 //------------ signUp ------------
 module.exports.signUp = async (req, res) => { 
-  const condidate = await prisma.users.findOne({
+  const coincident = await prisma.users.findOne({
     where: {
-      email: req.body.email,
+      email: req.body.email, 
     },
   })
-  if(!condidate) {
-    const newCondidate = await prisma.users.create({
-      data: {
-        email: req.body.email,
-        name: req.body.name,
-        password: req.body.password,
-      }
-    })
-    const token = jwt.sign({ ...newCondidate }, config.token_config, {expiresIn: 60 * 60}) 
-    return res.status(200).json({ token: `Bearer ${token}` });
+
+  if(!coincident) {  
+    const coincident = await prisma.users.findOne({
+      where: {
+        alias: req.body.alias, 
+      },
+    }) 
+    if(!coincident) {
+      const newCondidate = await prisma.users.create({
+        data: {
+          email: req.body.email,
+          alias: req.body.alias,
+          fio: req.body.fio,
+          password: await hash(req.body.password)
+        }
+      })
+      delete newCondidate.password;
+      return res.status(200).json({ token: getToken({ ...newCondidate }) });
+    } 
+    return res.status(412).json({ alias: 'Текущий псевдоним зарегистрирован' });
   }
-  return res.status(401).json({ message: 'Текущий email зарегистрирован' });
+  return res.status(412).json({ email: 'Текущий email зарегистрирован' });
 }
 //--------------------------------
 

@@ -10,8 +10,9 @@ datasource db {
 model users {
   id       String @id @default(dbgenerated())
   email    String @unique
-  name     String
   password String
+  alias    String @unique
+  fio      String
 }
 
 model jobPositions {
