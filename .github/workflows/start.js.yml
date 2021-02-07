@@ -26,3 +26,4 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install --save --legacy-peer-deps 
+    - run: npm start
