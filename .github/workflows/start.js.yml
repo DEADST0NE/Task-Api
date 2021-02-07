@@ -25,5 +25,4 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: node --max-old-space-size=4096 yourFile.js
     - run: npm install --save --legacy-peer-deps 
